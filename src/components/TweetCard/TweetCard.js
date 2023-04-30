@@ -16,9 +16,6 @@ import mainPicture from "../../images/main-picture.png";
 import avatarDefault from "../../images/avatar.png";
 
 export const TweetCard = ({ id, tweets, followers, avatar }) => {
-  // const [isFollow, setIsFollow] = useState(
-  //   localStorage.getItem(`isFollow${id}`)
-  // );
   const [btnText, setBtnText] = useState(
     localStorage.getItem(`btnText${id}`)
       ? JSON.parse(localStorage.getItem(`btnText${id}`))
@@ -56,7 +53,11 @@ export const TweetCard = ({ id, tweets, followers, avatar }) => {
         <MiddleLine>
           <Circle>
             <AvatarWrap>
-              <Avatar src={avatar} alt="avatar" />
+              {!avatar ? (
+                <Avatar src={avatarDefault} alt="avatar" />
+              ) : (
+                <Avatar src={avatar} alt="avatar" />
+              )}
             </AvatarWrap>
           </Circle>
         </MiddleLine>

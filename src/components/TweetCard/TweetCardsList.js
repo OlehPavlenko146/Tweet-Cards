@@ -1,14 +1,31 @@
 import { useEffect, useState } from "react";
 import { fetchUsers } from "../../services/api/httpRequests";
 import { TweetCard } from "./TweetCard";
-import { TweetCardList } from "./TweetCardsList.styled";
+
+import { TweetCardList, BtnWrap } from "./TweetCardsList.styled";
 import { Button } from "../../components/Button/Button";
+import { Loader } from "../Loader/Loader";
+import toast from "react-hot-toast";
 
 export const TweetCardsList = () => {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
-  const limitUsersPerPage = 3;
   const [isLoading, setIsLoading] = useState(false);
+
+  const limitUsersPerPage = 3;
+
+  const loadMore = () => {
+    setPage((page) => page + 1);
+  };
+
+  const previous = () => {
+    setPage((page) => page - 1);
+  };
+
+  let lastUserIdx = page * limitUsersPerPage;
+  let firstUserIdx = lastUserIdx - limitUsersPerPage;
+  const currentUsers = users.slice(firstUserIdx, lastUserIdx);
+
   useEffect(() => {
     async function getUsers() {
       try {
@@ -19,7 +36,7 @@ export const TweetCardsList = () => {
           setUsers(users.map((user) => user));
         }
       } catch (error) {
-        console.log(error);
+        toast("Something went wrong...");
       } finally {
         setIsLoading(false);
       }
@@ -28,16 +45,10 @@ export const TweetCardsList = () => {
     getUsers();
   }, []);
 
-  const loadMore = () => {
-    setPage((page) => page + 1);
-  };
-
-  const lastUserIdx = page * limitUsersPerPage;
-  const firstUserIdx = lastUserIdx - limitUsersPerPage;
-  const currentUsers = users.slice(firstUserIdx, lastUserIdx);
-
   return (
     <>
+      {isLoading && <Loader />}
+
       <TweetCardList>
         {currentUsers?.map((user) => (
           <li key={user.id}>
@@ -50,7 +61,15 @@ export const TweetCardsList = () => {
           </li>
         ))}
       </TweetCardList>
-      <Button onClick={loadMore} />
+      <BtnWrap>
+        {currentUsers.length >= limitUsersPerPage &&
+          users.length !== lastUserIdx && (
+            <Button onClick={loadMore} name={"Load more"} />
+          )}
+        {lastUserIdx > limitUsersPerPage && (
+          <Button onClick={previous} name={"Previous"} />
+        )}
+      </BtnWrap>
     </>
   );
 };
